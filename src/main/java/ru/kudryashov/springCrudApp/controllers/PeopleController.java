@@ -1,13 +1,14 @@
 package ru.kudryashov.springCrudApp.controllers;
 
-
-import com.sun.org.glassfish.gmbal.ParameterNames;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.kudryashov.springCrudApp.DAO.PersonDAO;
 import ru.kudryashov.springCrudApp.models.Person;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/people")
@@ -19,7 +20,8 @@ public class PeopleController {
     PeopleController(PersonDAO personDAO) {
         this.personDAO = personDAO;
     }
-// Model отвечает за отображение на UI, через него идет передача данных из контроллера на представление(views)
+
+    // Model отвечает за отображение на UI, через него идет передача данных из контроллера на представление(views)
     @GetMapping()
     public String getAllPeople(Model model) {
         model.addAttribute("people", personDAO.getAllPeople());
@@ -37,9 +39,15 @@ public class PeopleController {
         model.addAttribute("person", new Person());
         return "people/form";
     }
-//@ModelAttribute принимает параметры из запроса и записывает по ключу значения в Person
+
+    //@ModelAttribute принимает параметры из запроса и записывает по ключу значения в Person
+    //BindingResult bindingResult хранит ошибки валидации
     @PostMapping()
-    public String createPerson(@ModelAttribute("person") Person person) {
+    public String createPerson(@ModelAttribute("person") @Valid Person person,
+                               BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "people/form";
+        }
         personDAO.save(person);
         return "redirect:/people";
     }
@@ -51,8 +59,12 @@ public class PeopleController {
     }
 
     @PatchMapping("/{id}")
-    public String updatePerson(@ModelAttribute("person") Person person,
+    public String updatePerson(@ModelAttribute("person") @Valid Person person,
+                               BindingResult bindingResult,
                                @PathVariable("id") int id) {
+        if (bindingResult.hasErrors()) {
+            return "people/edit";
+        }
         personDAO.update(id, person);
         return "redirect:/people";
     }
