@@ -1,4 +1,4 @@
-# Simple SpringMVC CRUD app
+# Simple SpringMVC CRUD app without BOOT!
 Training project. The DAO layer is based on the standard jdbc api.
 Spring JdbcTemplate integration has been completed in the withJdbcTemplate branch.
 
